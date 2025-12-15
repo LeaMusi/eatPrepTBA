@@ -12,6 +12,7 @@
 #'
 #' @aliases
 #' get_design,WorkspaceTestcenter-method
+#' @export
 setGeneric("get_design", function(workspace, units = NULL, overwrite = FALSE, mode = "run-hot-return") {
   cli_setting()
 
