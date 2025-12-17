@@ -22,7 +22,7 @@ You can install the development version of eatPrepTBA from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("franikowsp/eatPrepTBA")
+devtools::install_github("iqb-research/eatPrepTBA")
 ```
 
 ## Example
