@@ -1,3 +1,4 @@
+
 unnest_laststate <- function(json) {
   if (all(is.na(json))) {
     return(tibble::tibble(PLAYER = NA_character_))
