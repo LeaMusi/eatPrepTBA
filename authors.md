@@ -10,14 +10,14 @@
 
 ## Citation
 
-Franikowski P (2025). *eatPrepTBA: Prepare IQB Technology Based
-Assesssment (TBA)*. R package version 0.9.8.9001,
+Franikowski P (2026). *eatPrepTBA: Prepare IQB Technology Based
+Assesssment (TBA)*. R package version 0.9.8.9002,
 <https://iqb-research.github.io/eatPrepTBA/>.
 
     @Manual{,
       title = {eatPrepTBA: Prepare IQB Technology Based Assesssment (TBA)},
       author = {Philipp Franikowski},
-      year = {2025},
-      note = {R package version 0.9.8.9001},
+      year = {2026},
+      note = {R package version 0.9.8.9002},
       url = {https://iqb-research.github.io/eatPrepTBA/},
     }
