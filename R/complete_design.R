@@ -83,13 +83,13 @@ complete_design <- function(coded,
         (is.na(value) | code_id == -99) & code_status == "DISPLAYED" ~ "MISSING_BY_OMISSION",
         # Omissions found by the Studio
         is.na(code_type) & code_status %in% c("DISPLAYED", "PARTLY_DISPLAYED") ~ "MISSING_BY_OMISSION",
-        # -98 mbi: Invalid responses due to derivation (e.g., numbers in solver) or manual coding
+        # -98 mir: Invalid responses due to derivation (e.g., numbers in solver) or manual coding
         is.na(code_type) & code_status %in% c("INVALID", "DERIVE_ERROR") ~ "MISSING_INVALID_RESPONSE",
-        # -97 mci: Coding errors
+        # -97 mci: Coding errors und Coding impossible
         is.na(code_type) & code_status == "CODING_ERROR" ~ "MISSING_CODING_IMPOSSIBLE",
         # -96 mnr: Not reached (needs to be recoded with -99)
         is.na(code_type) & (code_status == "NOT_REACHED" | is.na(code_status)) ~ "MISSING_NOT_REACHED",
-        # -94 mnc: No codes available
+        # -93 mnc: No codes available -- reserviere -94 für Missing By Design
         is.na(code_type) & code_status == "NO_CODING" ~ "NO_CODING",
         # -90: Coding incomplete
         code_status %in% c("CODING_INCOMPLETE", "DERIVE_PENDING", "INTENDED_INCOMPLETE") ~ code_status,
@@ -102,7 +102,7 @@ complete_design <- function(coded,
         "MISSING_CODING_IMPOSSIBLE" ~ -97,
         "MISSING_NOT_REACHED" ~ -96,
         "INTENDED_INCOMPLETE" ~ -95,
-        "NO_CODING" ~ -94,
+        "NO_CODING" ~ -93,
         # Should not be in the final dataset after manual coding!
         c("CODING_INCOMPLETE", "DERIVE_PENDING") ~ -90,
 
@@ -161,7 +161,7 @@ complete_design <- function(coded,
       ),
       code_score = dplyr::case_when(
         code_id %in% c(-99, -98) ~ 0,
-        code_id %in% c(-97, -96, -95, -94, -90) ~ NA,
+        code_id %in% c(-97, -96, -95, -93, -90) ~ NA,
         .default = code_score
       )
     ) %>%
