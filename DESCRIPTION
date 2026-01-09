@@ -1,10 +1,12 @@
 Package: eatPrepTBA
 Title: Prepare IQB Technology Based Assesssment (TBA)
-Version: 0.9.8.9002
+Version: 0.9.8.9003
 Authors@R: 
     c(person("Philipp", "Franikowski", , "philipp.franikowski@iqb.hu-berlin.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2109-7388")),
-    person(given = "Karoline", family ="Sachse", email = "karoline.sachse@iqb.hu-berlin.de", role = c("ctb"), comment = c(ORCID = "0000-0001-6688-1267")))
+    person(given = "Karoline", family ="Sachse", email = "karoline.sachse@iqb.hu-berlin.de", role = c("ctb"), comment = c(ORCID = "0000-0001-6688-1267")),
+    person(given = "Jakob", family ="Schäfer", email = "jakob.schaefer@iqb.hu-berlin.de", role = c("ctb"), comment = c(ORCID = "0009-0006-2680-0585"))
+    )
 Maintainer: Karoline A. Sachse <karoline.sachse@iqb.hu-berlin.de>
 Description: 
     Provides wrapper functions to interact with the IQB Studio and the IQB Testcenter APIs. 
@@ -16,6 +18,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports: 
     cli,
+    crayon,
     curl,
     dplyr,
     eatAutoCode,
@@ -26,19 +29,21 @@ Imports:
     lubridate,
     magrittr,
     purrr (>= 1.0.4),
+    reactable,
     readr,
     rlang,
     rstudioapi,
     rvest,
+    shiny,
     stringr,
+    testthat (>= 3.0.0),
     tibble,
     tidyr,
     utils,
     xml2
 Suggests: 
     knitr,
-    rmarkdown,
-    testthat (>= 3.0.0)
+    rmarkdown
 Remotes: iqb-research/eatAutoCode
 Config/testthat/edition: 3
 URL: https://iqb-research.github.io/eatPrepTBA/
