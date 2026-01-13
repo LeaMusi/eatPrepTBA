@@ -239,7 +239,7 @@ test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, con
 
         if(nrow(result) > 0) {
           colour_scheme(glue::glue("Fehler gefunden"), "rot", result)
-          print(result %>% dplyr::select(any_of(print_cols)) %>% dplyr::distinct(.keep_all = TRUE))
+          print(result %>% dplyr::select(dplyr::any_of(print_cols)) %>% dplyr::distinct(.keep_all = TRUE))
         } else {
           colour_scheme(glue::glue("Keine Fehler gefunden"), "grün")
           }
@@ -305,7 +305,7 @@ test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, con
         shiny::tabPanel(
           title = unique(df$Test),
           reactable::reactable(
-            df %>% dplyr::select(any_of(show_cols)),
+            df %>% dplyr::select(dplyr::any_of(show_cols)),
             searchable = TRUE, filterable = TRUE, pagination = FALSE,
             bordered = TRUE, striped = TRUE,
             columns = list(

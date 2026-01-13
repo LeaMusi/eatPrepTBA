@@ -72,6 +72,7 @@ reference:
   - prepare_codebook
   - download_units
   - add_groups
+  - test_coding_scheme
 - subtitle: Prepare studies on IQB Testcenter
   contents:
   - generate_testtakers
