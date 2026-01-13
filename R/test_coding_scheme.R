@@ -15,7 +15,15 @@
 #' @aliases
 #' test_coding_scheme,WorkspaceStudio-method
 #'
-#' @examples test_coding_scheme(data = data, name_list = FALSE, console = FALSE, exceptions = rlang::list2("8" = "MZB270","12" = "MMB035"))
+#' @examples
+#' \dontrun{
+#' test_coding_scheme(
+#'   data = data, 
+#'   name_list = FALSE, 
+#'   console = FALSE, 
+#'   exceptions = rlang::list2("8" = "MZB270","12" = "MMB035")
+#' )
+#' }
 #'
 
 
@@ -171,15 +179,15 @@ test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, con
   # Ausgabe-Helfer -------------------------------------------------------------
   colour_scheme <- function(text_block, colour, result = NULL) {
     if (colour == "gelb") {
-      cat(crayon::yellow(paste0("→ ", text_block)), "\n")
+      cat(crayon::yellow(paste0("\u2192", text_block)), "\n")
     } else if (colour == "blau") {
       cat(crayon::blue(paste0("== ", text_block, " ==")), "\n")
     } else if (colour == "rot" && !is.null(result)) {
-      cat(crayon::red(glue::glue("❌ {nrow(result)} {text_block}")), "\n")
+      cat(crayon::red(glue::glue("\u274C {nrow(result)} {text_block}")), "\n")
     } else if (colour == "weiß") {
       cat(text_block, "\n")
     } else if (colour == "grün") {
-      cat(crayon::green(glue::glue("✅ {text_block}")), "\n")
+      cat(crayon::green(glue::glue("\u2705{text_block}")), "\n")
     }
   }
 
@@ -249,7 +257,9 @@ test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, con
 
 
   # Tests ausführen ------------------------------------------------------------
-  if(console) {cat("\033[33m❗❗ Deaktivierte Variablen werden IMMER ignoriert ❗❗\033[0m\n\n")}
+  if (console) {
+    cat("\033[33m!! Deaktivierte Variablen werden IMMER ignoriert !!\033[0m\n\n")
+  }
   purrr::walk2(tests, seq_along(tests), ~run_test(desc = .x$desc,
                                                   print_cols = .x$print_cols,
                                                   code_block =  .x$code,
@@ -308,7 +318,7 @@ test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, con
       })
 
     page <- shiny::fluidPage(
-      htmltools::tags$h2("Testfehler – Übersicht"),
+      htmltools::tags$h2("Testfehler - Uebersicht"),
       do.call(shiny::tabsetPanel, tabs)
     )
 

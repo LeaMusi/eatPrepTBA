@@ -28,6 +28,13 @@ An html-table and console output if needed.
 This function can be used to determine frequently made mistakes in the coding scheme.
 }
 \examples{
-test_coding_scheme(data = data, name_list = FALSE, console = FALSE, exceptions = rlang::list2("8" = "MZB270","12" = "MMB035"))
+\dontrun{
+test_coding_scheme(
+  data = data, 
+  name_list = FALSE, 
+  console = FALSE, 
+  exceptions = rlang::list2("8" = "MZB270","12" = "MMB035")
+)
+}
 
 }
