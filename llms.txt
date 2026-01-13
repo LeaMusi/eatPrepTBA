@@ -159,6 +159,8 @@ Functions to check units, prepare material for administration and coding
   : Download units
 - [`add_groups()`](https://iqb-research.github.io/eatPrepTBA/reference/add_groups.md)
   : Add workspace groups for a Studio workspace
+- [`test_coding_scheme()`](https://iqb-research.github.io/eatPrepTBA/reference/test_coding_scheme.md)
+  : Test Coding Scheme
 
 ### Prepare studies on IQB Testcenter
 
