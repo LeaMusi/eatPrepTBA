@@ -20,5 +20,10 @@ utils::globalVariables(c(
   "variable_source_type",
   "Test",
   "print_cols",
-  "n"
+  "n",
+  "id",
+  "code",
+  "score",
+  "status",
+  "insert_manual"
 ))
