@@ -179,30 +179,31 @@ test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, con
   # Ausgabe-Helfer -------------------------------------------------------------
   colour_scheme <- function(text_block, colour, result = NULL) {
     if (colour == "gelb") {
-      cat(crayon::yellow(paste0("\u2192", text_block)), "\n")
+      cat(crayon::yellow(paste0("-> ", text_block)), "\n")
     } else if (colour == "blau") {
       cat(crayon::blue(paste0("== ", text_block, " ==")), "\n")
     } else if (colour == "rot" && !is.null(result)) {
-      cat(crayon::red(glue::glue("\u274C {nrow(result)} {text_block}")), "\n")
-    } else if (colour == "weiß") {
+      cat(crayon::red(glue::glue("X {nrow(result)} {text_block}")), "\n")
+    } else if (colour == "weiss") {
       cat(text_block, "\n")
-    } else if (colour == "grün") {
-      cat(crayon::green(glue::glue("\u2705{text_block}")), "\n")
+    } else if (colour == "gruen") {
+      cat(crayon::green(glue::glue("OK {text_block}")), "\n")
     }
   }
+  
 
 
-  # Testthat-reporter auf "silent" setzen, damit er keinen unerwünschten output generiert
+  # Testthat-reporter auf "silent" setzen, damit er keinen unerwuenschten output generiert
   testthat::set_reporter("silent")
 
 
   # Test-Runner ----------------------------------------------------------------
   run_test <- function(desc, print_cols, code_block, test_nr, console) {
 
-    # Test zur Liste aller Tests hinzufügen
+    # Test zur Liste aller Tests hinzufuegen
     all_tests <<- c(all_tests, desc)
 
-    # Test ausführen
+    # Test ausfuehren
     result <- code_block()
 
     # Ausnahmen filtern
@@ -241,7 +242,7 @@ test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, con
           colour_scheme(glue::glue("Fehler gefunden"), "rot", result)
           print(result %>% dplyr::select(dplyr::any_of(print_cols)) %>% dplyr::distinct(.keep_all = TRUE))
         } else {
-          colour_scheme(glue::glue("Keine Fehler gefunden"), "grün")
+          colour_scheme(glue::glue("Keine Fehler gefunden"), "gruen")
           }
           cat(strrep("_", 110), "\n\n")
         }
@@ -250,13 +251,13 @@ test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, con
 
 
 
-  # Nur Testnamen zurückgeben --------------------------------------------------
+  # Nur Testnamen zurueckgeben --------------------------------------------------
   if (name_list) {
     return(tibble::tibble(Nr = seq_along(tests), Testname = purrr::map_chr(tests, "desc")))
   }
 
 
-  # Tests ausführen ------------------------------------------------------------
+  # Tests ausfuehren ------------------------------------------------------------
   if (console) {
     cat("\033[33m!! Deaktivierte Variablen werden IMMER ignoriert !!\033[0m\n\n")
   }
@@ -266,7 +267,7 @@ test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, con
                                                   test_nr = .y,
                                                   console = console))
 
-  # Fehlerliste zurückgeben ---------------------------------------------------
+  # Fehlerliste zurueckgeben ---------------------------------------------------
 
   status_table <- tibble::tibble(Test = all_tests)
 
@@ -291,7 +292,7 @@ test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, con
       dplyr::mutate(Status = "Test bestanden")
   }
 
-  # Immer drucken, unabhängig von console
+  # Immer drucken, unabhaengig von console
   print(status_table)
   invisible(status_table)
 
@@ -310,7 +311,7 @@ test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, con
             bordered = TRUE, striped = TRUE,
             columns = list(
               link = reactable::colDef(
-                cell = function(value) if (!is.na(value)) htmltools::a("Link öffnen", href = value, target = "_blank") else ""
+                cell = function(value) if (!is.na(value)) htmltools::a("Link", href = value, target = "_blank") else ""
               )
             )
           )
