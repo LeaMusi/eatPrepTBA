@@ -44,7 +44,8 @@ setMethod("get_logs",
 
             resp <-
               groups %>%
-              purrr::map(run_req, .progress = "Downloading logs")
+              purrr::map(run_req, .progress = "Downloading logs") %>%
+              purrr::compact()
 
             if (!is.null(resp)) {
               logs_raw <-
