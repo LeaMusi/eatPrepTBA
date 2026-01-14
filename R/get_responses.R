@@ -32,11 +32,18 @@ setMethod("get_responses",
 
             # TODO: Loop, but no safe-run by now
             run_req <- function(group) {
-              base_req(method = "GET",
-                       endpoint = c("workspace", ws_id, "report", "response"),
-                       query = list(dataIds = group)) %>%
-                httr2::req_perform() %>%
-                httr2::resp_body_json()
+              resp <- base_req(
+                method = "GET",
+                endpoint = c("workspace", ws_id, "report", "response"),
+                query = list(dataIds = group)
+              ) %>%
+                httr2::req_perform()
+
+              # Hotfix of `Can't retrieve empty body.` To be tested.
+              tryCatch(
+                httr2::resp_body_json(resp),
+                error = function(e) NULL
+              )
             }
 
             # resp <-
