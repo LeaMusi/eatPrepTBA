@@ -53,6 +53,7 @@ reference:
   - prepare_logs
   - get_reviews
   - compute_sizes
+  - prepare_coded
 - subtitle: Functions for units
   contents:
   - add_metadata
