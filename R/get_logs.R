@@ -4,7 +4,7 @@
 #' @param groups Character. Name of the groups to be retrieved  or all groups if not specified. Please note, that this has to be specified in all-capital letters.
 #'
 #' @description
-#' This function returns logs from the IQB Testcenter
+#' This function returns logs from the IQB Testcenter, reshapes them to a tibble and renames some variables.
 #'
 #' @return A tibble.
 #' @export
