@@ -1,4 +1,6 @@
 #' Sets and layouts quantile tables of stay times
+#' 
+#' Author: Philipp Franikowski, restructuring by Lea Musiolek
 #'
 #' @return Tables, including quantile dot plots, ready for using in quarto document
 #'
@@ -7,7 +9,7 @@
 #'
 #' Collection of functions for rendering pre-existing quantile tables of unit, page and item
 #' stay times into a shape and layout suitable for a quarto document.
-#' Achtung! Der Datensatz muss hier immer data heißen bei diesen Calls!
+#' Attention! Dataset needs to be called "data".
 #'
 #' @export
 
@@ -344,7 +346,7 @@ colNoShow <-
   map(function(x) colDef(show = FALSE)) %>%
   set_names(no_show_list)
 
-generate_staytime_table <- function(data,
+layout_staytime_table <- function(data,
                                id = "unit-table",
                                subject = "dep",
                                filterable = TRUE,
