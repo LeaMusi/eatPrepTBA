@@ -32,11 +32,21 @@ setMethod("get_responses",
 
             # TODO: Loop, but no safe-run by now
             run_req <- function(group) {
-              base_req(method = "GET",
-                       endpoint = c("workspace", ws_id, "report", "response"),
-                       query = list(dataIds = group)) %>%
-                httr2::req_perform() %>%
-                httr2::resp_body_json()
+              resp <- base_req(
+                method = "GET",
+                endpoint = c("workspace", ws_id, "report", "response"),
+                query = list(dataIds = group)
+              ) %>%
+                httr2::req_perform()
+
+              # Hotfix of `Can't retrieve empty body.` To be tested.
+              tryCatch(
+                httr2::resp_body_json(resp),
+                error = function(e) {
+                  warning("Failed to parse response for group: ", paste(group, collapse = ", "))
+                  NULL
+                }
+              )
             }
 
             # resp <-
@@ -47,7 +57,8 @@ setMethod("get_responses",
 
             resp <-
               groups %>%
-              purrr::map(run_req, .progress = "Downloading responses")
+              purrr::map(run_req, .progress = "Downloading responses") %>%
+              purrr::compact()
 
             if (!is.null(resp)) {
               responses_raw <-
@@ -130,8 +141,10 @@ setMethod("get_responses",
                 dplyr::ungroup() %>%
                 dplyr::rename(
                   dplyr::any_of(c(
+                    coded = "responses_content",
                     responses = "elementCodes_content",
                     state_variables = "stateVariableCodes_content",
+                    coded_ts = "responses_ts",
                     responses_ts = "elementCodes_ts",
                     state_variables_ts = "stateVariableCodes_ts",
                     player = "PLAYER",
