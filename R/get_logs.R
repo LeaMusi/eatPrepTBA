@@ -36,7 +36,10 @@ setMethod("get_logs",
               # Hotfix of `Can't retrieve empty body.` To be tested.
               tryCatch(
                 httr2::resp_body_json(resp),
-                error = function(e) NULL
+                error = function(e) {
+                  warning("Failed to parse response for group: ", paste(group, collapse = ", "))
+                  NULL
+                }
               )
             }
 
