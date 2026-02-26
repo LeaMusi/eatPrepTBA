@@ -21,7 +21,7 @@ download_button <- function(id, columns, download) {
   columns_json <- jsonlite::toJSON(columns)
   callback <- glue::glue("Reactable.downloadDataCSV('{id}', '{download}.csv', {{columnIds: {columns_json}, sep: ';', dec: ','}})")
   
-  browsable(tags$button(shiny::icon("download"), "Herunterladen", onclick = callback))
+  htmltools::browsable(tags$button(shiny::icon("download"), "Herunterladen", onclick = callback))
 }
 
 # Filterfunktionen (allgemein)
@@ -47,7 +47,7 @@ filter_min <- htmlwidgets::JS("function(rows, columnId, filterValue) {
 
 filter_input_slider <- function(id, min = NULL, max = NULL, step = .001) {
   function(values, name) {
-    oninput <- str_glue("Reactable.setFilter('{id}', '{name}', this.value)")
+    oninput <- stringr::str_glue("Reactable.setFilter('{id}', '{name}', this.value)")
     
     min_val <- ifelse(is.null(min), min(values, na.rm = TRUE), min)
     max_val <- ifelse(is.null(max), max(values, na.rm = TRUE), max)
@@ -70,7 +70,7 @@ filter_input_slider <- function(id, min = NULL, max = NULL, step = .001) {
         value = ifelse(length(values) == 0, min, min_val),
         oninput = oninput,
         onchange = oninput, # For IE11 support
-        "aria-label" = str_glue("Filter by minimum {name}")
+        "aria-label" = stringr::str_glue("Filter by minimum {name}")
       ),
       
     )
@@ -81,13 +81,13 @@ filter_input_slider <- function(id, min = NULL, max = NULL, step = .001) {
 display_linkset <- function(value, index) {
   if (!is.na(value)) {
     link_icon_old <- shiny::icon("box-archive", lib = "font-awesome")
-    
-    a(
-      link_icon_old, target = "_blank", href = value,
-      style = "color: #a8a29e;",
-      onmouseover = "this.style.color='#d6d3d1'",
-      onmouseout = "this.style.color='#a8a29e'"
-    )
+    # 
+    # a(
+    #   link_icon_old, target = "_blank", href = value,
+    #   style = "color: #a8a29e;",
+    #   onmouseover = "this.style.color='#d6d3d1'",
+    #   onmouseout = "this.style.color='#a8a29e'"
+    # )
   }
 }
 
@@ -100,10 +100,10 @@ display_badge <- function(data, digits = 2, na = "-") {
     
     print_value <- printnum(value, digits = digits, gt1 = TRUE)
     
-    badge <- status_badge(color = data[[index, str_glue("color_{name}")]])
-    badge_tool <- with_tooltip(badge, data[[index, str_glue("tooltip_{name}")]])
+    badge <- status_badge(color = data[[index, stringr::str_glue("color_{name}")]])
+    badge_tool <- with_tooltip(badge, data[[index, stringr::str_glue("tooltip_{name}")]])
     
-    tagList(badge_tool, print_value)
+    shiny::tagList(badge_tool, print_value)
   }
 }
 
@@ -163,9 +163,9 @@ display_dotplot <- function(data, design = NULL) {
       q95 <- data[[index, "unit_q95"]]
       # tdiff <- data[[index, "unit_diff"]]
     } else {
-      q90 <- data[[index, str_glue("unit_q90_{design}")]]
-      q95 <- data[[index, str_glue("unit_q95_{design}")]]
-      # tdiff <- data[[index, str_glue("unit_diff_{design}")]]
+      q90 <- data[[index, stringr::str_glue("unit_q90_{design}")]]
+      q95 <- data[[index, stringr::str_glue("unit_q95_{design}")]]
+      # tdiff <- data[[index, stringr::str_glue("unit_diff_{design}")]]
     }
     
     # color <- case_when(
@@ -396,9 +396,9 @@ layout_staytime_table <- function(data,
   if (id == "item-table") {
     group_item <-
       list(
-        colGroup(name = "Item (Global)", columns = c("page_median", "page_q90", "page_q95")),
-        colGroup(name = "Item (Regel)", columns = c("page_median_RS", "page_q90_RS", "page_q95_RS")),
-        colGroup(name = "Item (SPF)", columns = c("page_median_FS", "page_q90_FS", "page_q95_FS"))
+        reactable::colGroup(name = "Item (Global)", columns = c("page_median", "page_q90", "page_q95")),
+        reactable::colGroup(name = "Item (Regel)", columns = c("page_median_RS", "page_q90_RS", "page_q95_RS")),
+        reactable::colGroup(name = "Item (SPF)", columns = c("page_median_FS", "page_q90_FS", "page_q95_FS"))
       )
   }
   
@@ -407,9 +407,9 @@ layout_staytime_table <- function(data,
       data,
       columnGroups = c(
         list(
-          colGroup(name = "Unit (Global)", columns = c("unit_median", "unit_q90", "unit_q95", "unit_diff", "unit_diff95")),
-          colGroup(name = "Unit (Regel)", columns = c("unit_median_RS", "unit_q90_RS", "unit_q95_RS", "unit_diff_RS", "unit_diff95_RS")),
-          colGroup(name = "Unit (SPF)", columns = c("unit_median_FS", "unit_q90_FS", "unit_q95_FS", "unit_diff_FS", "unit_diff95_FS"))
+          reactable::colGroup(name = "Unit (Global)", columns = c("unit_median", "unit_q90", "unit_q95", "unit_diff", "unit_diff95")),
+          reactable::colGroup(name = "Unit (Regel)", columns = c("unit_median_RS", "unit_q90_RS", "unit_q95_RS", "unit_diff_RS", "unit_diff95_RS")),
+          reactable::colGroup(name = "Unit (SPF)", columns = c("unit_median_FS", "unit_q90_FS", "unit_q95_FS", "unit_diff_FS", "unit_diff95_FS"))
         ),
         group_item
       ),
@@ -532,6 +532,6 @@ generate_checkbox <- function(label, checked = NULL, id = "item-table", columns,
     label,
     type = "checkbox",
     checked = if (is.null(checked) || !checked) NULL else checked,
-    onChange = HTML(js_code)
+    onChange = htmltools::HTML(js_code)
   )
 }
