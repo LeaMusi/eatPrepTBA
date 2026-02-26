@@ -25,7 +25,7 @@ download_button <- function(id, columns, download) {
 }
 
 # Filterfunktionen (allgemein)
-filter_multiple <- JS("function(rows, columnId, filterValue) {
+filter_multiple <- htmlwidgets::JS("function(rows, columnId, filterValue) {
   if (typeof filterValue === 'string') {
     // Split comma-separated values, trim spaces, and convert to lowercase
     filterValue = filterValue.split(',').map(value => value.trim().toLowerCase());
@@ -39,7 +39,7 @@ filter_multiple <- JS("function(rows, columnId, filterValue) {
 }")
 
 
-filter_min <- JS("function(rows, columnId, filterValue) {
+filter_min <- htmlwidgets::JS("function(rows, columnId, filterValue) {
         return rows.filter(function(row) {
           return isNaN(filterValue) || row.values[columnId] >= Number(filterValue)
         })
@@ -117,7 +117,7 @@ display_badge <- function(data, digits = 2, na = "-") {
 #   }
 # }
 
-sort_function <- JS("function(rowInfo, column, state) {
+sort_function <- htmlwidgets::JS("function(rowInfo, column, state) {
   const {id} = column;
   const firstSorted = state.sorted[0]
   const validIds = ['domain', 'unit_key', 'unit_median', 'unit_label'];
@@ -201,84 +201,84 @@ display_dotplot <- function(data, design = NULL) {
 
 colUnit <- function(data, id) {
   list(
-    link = colDef(
+    link = reactable::colDef(
       name = "Links",
       width = 100,
       filterable = FALSE,
       sortable = FALSE,
       cell = display_linkset
     ),
-    unit_key = colDef(
+    unit_key = reactable::colDef(
       name = "Kurzname",
       style = sort_function,
       cell = function(value) htmltools::tags$code(value)
     ),
-    unit_label = colDef(
+    unit_label = reactable::colDef(
       name = "Aufgabenbezeichnung",
       width = 350,
       style = sort_function
     ),
-    unit_estimated = colDef(
+    unit_estimated = reactable::colDef(
       name = "a-priori",
       cell = to_stamp,
       style = sort_function
     ),
-    unit_diff = colDef(
+    unit_diff = reactable::colDef(
       name = "Differenz Q90",
       cell = to_stamp,
       style = sort_function
     ),
-    unit_diff95 = colDef(
+    unit_diff95 = reactable::colDef(
       name = "Differenz Q95",
       cell = to_stamp,
       style = sort_function
     ),
     
     # Globale Werte
-    unit_median = colDef(
+    unit_median = reactable::colDef(
       name = "Median",
       cell = display_dotplot(data),
       style = sort_function,
       width = 400
     ),
-    unit_q90 = colDef(
+    unit_q90 = reactable::colDef(
       name = "Q90",
       cell = to_stamp,
       style = sort_function
     ),
-    unit_q95 = colDef(
+    unit_q95 = reactable::colDef(
       name = "Q95",
       cell = to_stamp,
       style = sort_function
     ),
     
     # Regelschulwerte
-    unit_diff_RS = colDef(
+    unit_diff_RS = reactable::colDef(
       name = "Differenz Q90",
       cell = to_stamp,
       show = FALSE,
       style = sort_function
     ),
-    unit_diff95_RS = colDef(
+    unit_diff95_RS = reactable::colDef(
       name = "Differenz Q95",
       cell = to_stamp,
       show = FALSE,
       style = sort_function
     ),
-    unit_median_RS = colDef(
+    unit_median_RS = reactable::colDef(
       name = "Median",
       cell = display_dotplot(data, design = "RS"),
       style = sort_function,
       show = FALSE,
       width = 400
     ),
-    unit_q90_RS = colDef(
+    unit_q90_RS = reactable::colDef(
       name = "Q90",
       cell = to_stamp,
       show = FALSE,
       style = sort_function
     ),
-    unit_q95_RS = colDef(
+    unit_q95_RS = reactable::colDef(
       name = "Q95",
       cell = to_stamp,
       show = FALSE,
@@ -286,32 +286,32 @@ colUnit <- function(data, id) {
     ),
     
     # Förderschulwerte
-    unit_diff_FS = colDef(
+    unit_diff_FS = reactable::colDef(
       name = "Differenz Q90",
       cell = to_stamp,
       show = FALSE,
       style = sort_function
     ),
-    unit_diff95_FS = colDef(
+    unit_diff95_FS = reactable::colDef(
       name = "Differenz Q95",
       cell = to_stamp,
       show = FALSE,
       style = sort_function
     ),
-    unit_median_FS = colDef(
+    unit_median_FS = reactable::colDef(
       name = "Median",
       cell = display_dotplot(data, design = "FS"),
       style = sort_function,
       show = FALSE,
       width = 400
     ),
-    unit_q90_FS = colDef(
+    unit_q90_FS = reactable::colDef(
       name = "Q90",
       cell = to_stamp,
       show = FALSE,
       style = sort_function
     ),
-    unit_q95_FS = colDef(
+    unit_q95_FS = reactable::colDef(
       name = "Q95",
       cell = to_stamp,
       show = FALSE,
@@ -321,17 +321,17 @@ colUnit <- function(data, id) {
 }
 
 colPage <- list(
-  variable_page = colDef(name = "Seite"),
-  page_median = colDef(name = "Median", cell = to_stamp),
-  page_q90 = colDef(name = "Q90", cell = to_stamp),
-  page_q95 = colDef(name = "Q95", cell = to_stamp),
-  page_median_RS = colDef(name = "Median", cell = to_stamp, show = FALSE),
-  page_q90_RS = colDef(name = "Q90", cell = to_stamp, show = FALSE),
-  page_q95_RS = colDef(name = "Q95", cell = to_stamp, show = FALSE),
-  page_median_FS = colDef(name = "Median", cell = to_stamp, show = FALSE),
-  page_q90_FS = colDef(name = "Q90", cell = to_stamp, show = FALSE),
-  page_q95_FS = colDef(name = "Q95", cell = to_stamp, show = FALSE),
-  item_id = colDef(name = "Item", style = sort_function,
+  variable_page = reactable::colDef(name = "Seite"),
+  page_median = reactable::colDef(name = "Median", cell = to_stamp),
+  page_q90 = reactable::colDef(name = "Q90", cell = to_stamp),
+  page_q95 = reactable::colDef(name = "Q95", cell = to_stamp),
+  page_median_RS = reactable::colDef(name = "Median", cell = to_stamp, show = FALSE),
+  page_q90_RS = reactable::colDef(name = "Q90", cell = to_stamp, show = FALSE),
+  page_q95_RS = reactable::colDef(name = "Q95", cell = to_stamp, show = FALSE),
+  page_median_FS = reactable::colDef(name = "Median", cell = to_stamp, show = FALSE),
+  page_q90_FS = reactable::colDef(name = "Q90", cell = to_stamp, show = FALSE),
+  page_q95_FS = reactable::colDef(name = "Q95", cell = to_stamp, show = FALSE),
+  item_id = reactable::colDef(name = "Item", style = sort_function,
                    cell = function(value) htmltools::tags$code(value),
                    width = 120
   )
@@ -343,8 +343,8 @@ no_show_list <- c(
 
 colNoShow <-
   no_show_list %>%
-  map(function(x) colDef(show = FALSE)) %>%
-  set_names(no_show_list)
+  purrr::map(function(x) reactable::colDef(show = FALSE)) %>%
+  purrr::set_names(no_show_list)
 
 layout_staytime_table <- function(data,
                                id = "unit-table",

@@ -7,14 +7,14 @@
 #' log data with eatPrepTBA::get_logs() and then using eatPrepTBA::estimate_unit_times(). 
 #' If necessary, data for the subject in question needs to be selected.
 #' @param unit_domains Data frame. Three string variables: subject (should equal fach), 
-#' domain ('[fach][competency]'), unit_key. Should contain each relevant unit_key once.
+#' domain ('<fach><Kompetenz>'), unit_key. Should contain each relevant unit_key once.
 #' Important for assigning subject and domain to each unit key down the line. Can be generated 
 #' from the blocks.xlsx used for generating the tests.
 #' @param final_responses Data frame. Contains the item-wise and respondent-wise responses,
 #' ideally corrected for switches etc. Relevant variables: id_used, code_type, 
 #' code_id, variable_source_type, booklet_id, item_id, IDSTUD, group_id, login_name, login_code,
 #' unit_key, variable_page
-#' @param unit_cs Data frame. Unit-wise coding schemes, exported directly from IQB Studio.
+#' @param units_cs Data frame. Unit-wise coding schemes, exported directly from IQB Studio.
 #' Relevant variables: unit_key, unit_codes, variable_label, variable_page, variable_id
 #' @param unit_meta Data frame. Unit-wise metadata, exported directly from IQB Studio. 
 #' Relevant variables: ws_id, unit_id, unit_key, unit_label, unit_metadata, item_metadata

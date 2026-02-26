@@ -26,6 +26,7 @@ Imports:
     eatAutoCode,
     glue,
     htmltools,
+    htmlwidgets,
     httr2,
     jsonlite,
     keyring,
