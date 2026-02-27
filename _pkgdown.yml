@@ -88,4 +88,8 @@ reference:
   - evaluate_psychometrics
   - layout_staytime_tables
   - tostamp
+  - colUnit
+  - display_dotplot
+  - generate_checkbox
+  - sort_function
   - compute_staytime_tables
