@@ -1,6 +1,15 @@
 #' Sets and layouts quantile tables of stay times
 #' 
 #' Author: Philipp Franikowski, restructuring by Lea Musiolek
+#' 
+#' @param data description
+#' @param id description
+#' @param subject description
+#' @param filterable description
+#' @param searchable description
+#' @param sortable description
+#' @param views description
+#' @param download description
 #'
 #' @return Tables, including quantile dot plots, ready for using in quarto document
 #'
@@ -12,245 +21,6 @@
 #' Attention! Dataset needs to be called "data" (Philipp).
 #'
 #' @export
-
-sort_function <- htmlwidgets::JS("function(rowInfo, column, state) {
-  const {id} = column;
-  const firstSorted = state.sorted[0]
-  const validIds = ['domain', 'unit_key', 'unit_median', 'unit_label'];
-  if (!firstSorted || validIds.includes(firstSorted.id)) {
-    const prevRow = state.pageRows[rowInfo.viewIndex - 1]
-    if (prevRow && rowInfo.values[id] === prevRow[id]) {
-      return { visibility: 'hidden' }
-    }
-  }
-}")
-
-colPage <- list(
-  variable_page = reactable::colDef(name = "Seite"),
-  page_median = reactable::colDef(name = "Median", cell = function(value) eatPrepTBA:::tostamp(value)),
-  page_q90 = reactable::colDef(name = "Q90", cell = function(value) eatPrepTBA:::tostamp(value)),
-  page_q95 = reactable::colDef(name = "Q95", cell = function(value) eatPrepTBA:::tostamp(value)),
-  page_median_RS = reactable::colDef(name = "Median", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
-  page_q90_RS = reactable::colDef(name = "Q90", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
-  page_q95_RS = reactable::colDef(name = "Q95", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
-  page_median_FS = reactable::colDef(name = "Median", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
-  page_q90_FS = reactable::colDef(name = "Q90", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
-  page_q95_FS = reactable::colDef(name = "Q95", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
-  item_id = reactable::colDef(name = "Item", style = sort_function,
-                   cell = function(value) htmltools::tags$code(value),
-                   width = 120)
-)
-
-no_show_list <- c(
-  "SPF"
-)
-
-colNoShow <-
-  no_show_list %>%
-  purrr::map(function(x) reactable::colDef(show = FALSE)) %>%
-  purrr::set_names(no_show_list)
-
-# Use the generated JavaScript in the onchange attribute
-generate_checkbox <- function(label, checked = NULL, id = "item-table", columns, filter_column = NULL) {
-  filter_code <- ""
-  if (!is.null(filter_column)) {
-    filter_code <- glue::glue("
-    if (!show) {{
-      Reactable.setAllFilters(id, {jsonlite::toJSON(filter_column, auto_unbox = TRUE)});
-    }}else {{
-      Reactable.setAllFilters(id, []);
-    }}")
-  }
-  
-  js_code <- glue::glue("((e) => {{
-    const show = !e.target.checked;
-    const id = '{id}';
-    console.log(Reactable.getState(id));
-    const cols = {jsonlite::toJSON(columns, auto_unbox = TRUE)};
-    cols.map(col => Reactable.toggleHideColumn(id, col, show));
-    {filter_code}
-    }})(event)")
-  
-  tags$input(
-    label,
-    type = "checkbox",
-    checked = if (is.null(checked) || !checked) NULL else checked,
-    onChange = htmltools::HTML(js_code)
-  )
-}
-
-# Format columns in the tables produced by layout_staytime_tables.R 
-colUnit <- function(data, id) {
-  list(
-    link = reactable::colDef(
-      name = "Links",
-      width = 100,
-      filterable = FALSE,
-      sortable = FALSE,
-      cell = shiny::icon("box-archive", lib = "font-awesome")
-    ),
-    unit_key = reactable::colDef(
-      name = "Kurzname",
-      style = sort_function,
-      cell = function(value) htmltools::tags$code(value)
-    ),
-    unit_label = reactable::colDef(
-      name = "Aufgabenbezeichnung",
-      width = 350,
-      style = sort_function
-    ),
-    unit_estimated = reactable::colDef(
-      name = "a-priori",
-      cell = to_stamp(value),
-      style = sort_function
-    ),
-    unit_diff = reactable::colDef(
-      name = "Differenz Q90",
-      cell = to_stamp(value),
-      style = sort_function
-    ),
-    unit_diff95 = reactable::colDef(
-      name = "Differenz Q95",
-      cell = to_stamp(value),
-      style = sort_function
-    ),
-    
-    # Globale Werte
-    unit_median = reactable::colDef(
-      name = "Median",
-      cell = display_dotplot(data),
-      style = sort_function,
-      width = 400
-    ),
-    unit_q90 = reactable::colDef(
-      name = "Q90",
-      cell = to_stamp(value),
-      style = sort_function
-    ),
-    unit_q95 = reactable::colDef(
-      name = "Q95",
-      cell = to_stamp(value),
-      style = sort_function
-    ),
-    
-    # Regelschulwerte
-    unit_diff_RS = reactable::colDef(
-      name = "Differenz Q90",
-      cell = to_stamp(value),
-      show = FALSE,
-      style = sort_function
-    ),
-    unit_diff95_RS = reactable::colDef(
-      name = "Differenz Q95",
-      cell = to_stamp(value),
-      show = FALSE,
-      style = sort_function
-    ),
-    unit_median_RS = reactable::colDef(
-      name = "Median",
-      cell = display_dotplot(data, design = "RS"),
-      style = sort_function,
-      show = FALSE,
-      width = 400
-    ),
-    unit_q90_RS = reactable::colDef(
-      name = "Q90",
-      cell = to_stamp(value),
-      show = FALSE,
-      style = sort_function
-    ),
-    unit_q95_RS = reactable::colDef(
-      name = "Q95",
-      cell = to_stamp(value),
-      show = FALSE,
-      style = sort_function
-    ),
-    
-    # Förderschulwerte
-    unit_diff_FS = reactable::colDef(
-      name = "Differenz Q90",
-      cell = to_stamp(value),
-      show = FALSE,
-      style = sort_function
-    ),
-    unit_diff95_FS = reactable::colDef(
-      name = "Differenz Q95",
-      cell = to_stamp(value),
-      show = FALSE,
-      style = sort_function
-    ),
-    unit_median_FS = reactable::colDef(
-      name = "Median",
-      cell = display_dotplot(data, design = "FS"),
-      style = sort_function,
-      show = FALSE,
-      width = 400
-    ),
-    unit_q90_FS = reactable::colDef(
-      name = "Q90",
-      cell = to_stamp(value),
-      show = FALSE,
-      style = sort_function
-    ),
-    unit_q95_FS = reactable::colDef(
-      name = "Q95",
-      cell = to_stamp(value),
-      show = FALSE,
-      style = sort_function
-    )
-  )
-}
-
-# Displaying quantiles as horizontal range charts
-#' @importFrom shiny div
-display_dotplot <- function(data, design = NULL) {
-  function(value, index) {
-    if (is.na(value)) {
-      return(value)
-    }
-    print_value <- to_stamp(value)
-    prior <- data[[index, "unit_estimated"]]
-    
-    if (is.null(design)) {
-      q90 <- data[[index, "unit_q90"]]
-      q95 <- data[[index, "unit_q95"]]
-      # tdiff <- data[[index, "unit_diff"]]
-    } else {
-      q90 <- data[[index, stringr::str_glue("unit_q90_{design}")]]
-      q95 <- data[[index, stringr::str_glue("unit_q95_{design}")]]
-      # tdiff <- data[[index, stringr::str_glue("unit_diff_{design}")]]
-    }
-    
-    # color <- case_when(
-    #   tdiff > 0 ~ "#fb7185",
-    #   tdiff < -60 ~ "#0ea5e9",
-    #   .default = "#34d399")
-    
-    div(
-      style = list(display = "flex"),
-      
-      div(print_value, style = list(flex = "0 0 40px")),
-      
-      eatWidget::range_chart(
-        est = prior,
-        est_min = q90,
-        est_max = q95,
-        global_est = value,
-        global_est_min = value,
-        global_est_max = q90,
-        width = 350,
-        height = 20,
-        min = 0,
-        max = 20 * 60,
-        color_line = "#bae6fd",
-        global_color_line = "#0ea5e9",
-        global_color = "#0ea5e9",
-        global_fill = "#0ea5e9",
-        fill = "#e2e8f0"
-      )
-    )
-  }
-}
 
 #' @importFrom dplyr intersect
 #' @importFrom purrr imap_lgl keep
@@ -264,6 +34,31 @@ layout_staytime_tables <- function(data,
                                sortable = TRUE,
                                views = TRUE,
                                download = NULL) {
+  colPage <- list(
+    variable_page = reactable::colDef(name = "Seite"),
+    page_median = reactable::colDef(name = "Median", cell = function(value) eatPrepTBA:::tostamp(value)),
+    page_q90 = reactable::colDef(name = "Q90", cell = function(value) eatPrepTBA:::tostamp(value)),
+    page_q95 = reactable::colDef(name = "Q95", cell = function(value) eatPrepTBA:::tostamp(value)),
+    page_median_RS = reactable::colDef(name = "Median", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
+    page_q90_RS = reactable::colDef(name = "Q90", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
+    page_q95_RS = reactable::colDef(name = "Q95", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
+    page_median_FS = reactable::colDef(name = "Median", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
+    page_q90_FS = reactable::colDef(name = "Q90", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
+    page_q95_FS = reactable::colDef(name = "Q95", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
+    item_id = reactable::colDef(name = "Item", style = sort_function,
+                                cell = function(value) htmltools::tags$code(value),
+                                width = 120)
+  )
+  
+  no_show_list <- c(
+    "SPF"
+  )
+  
+  colNoShow <-
+    no_show_list %>%
+    purrr::map(function(x) reactable::colDef(show = FALSE)) %>%
+    purrr::set_names(no_show_list)
+  
   unit_cols <- colUnit(data, id)
   
   columns <- c(
