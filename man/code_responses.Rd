@@ -26,7 +26,7 @@ code_responses(
 
 \item{missings}{Tibble (optional). Provide missing meta data with \code{code_id}, \code{code_status}, \code{code_score}, and \code{code_type}. Defaults to \code{NULL} and uses default scheme.
 
-This function automatically codes responses by using the \code{eatAutoCode} package. It is already prepared for the new data format of the responses received from the \code{\link[=get_responses]{get_responses()}} and \code{\link[=read_responses]{read_responses()}} routines. This function will soon be deleted and be part of \code{\link[eatAutoCode:code_responses]{eatAutoCode::code_responses()}}.}
+This function automatically codes responses by using the \code{eatAutoCode} package. It is already prepared for the new data format of the responses received from the \code{\link[=get_responses]{get_responses()}} and \code{\link[=read_responses]{read_responses()}} routines. This function will soon be deleted and be part of \code{\link[=code_responses]{code_responses()}}.}
 }
 \value{
 A tibble.

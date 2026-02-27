@@ -87,4 +87,5 @@ reference:
   - estimate_unit_times
   - evaluate_psychometrics
   - layout_staytime_tables
+  - tostamp
   - compute_staytime_tables

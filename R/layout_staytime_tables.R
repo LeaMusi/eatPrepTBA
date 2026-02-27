@@ -13,28 +13,6 @@
 #'
 #' @export
 
-to_stamp <- function(x) {
-  if (is.na(x)) {
-    return("-")
-  }
-  
-  sign_char <- ifelse(x < 0, "-", "")
-  abs_x <- abs(x)
-  
-  # Convert absolute value to period
-  p <- abs_x %>%
-    round() %>%
-    as.integer() %>%
-    lubridate::seconds_to_period()
-  
-  # Format as MM:SS
-  time_str <- sprintf("%02d:%02d", lubridate::minute(p), 
-                      lubridate::second(p))
-  
-  # Combine sign and time
-  paste0(sign_char, time_str)
-}
-
 sort_function <- htmlwidgets::JS("function(rowInfo, column, state) {
   const {id} = column;
   const firstSorted = state.sorted[0]
@@ -49,19 +27,18 @@ sort_function <- htmlwidgets::JS("function(rowInfo, column, state) {
 
 colPage <- list(
   variable_page = reactable::colDef(name = "Seite"),
-  page_median = reactable::colDef(name = "Median", cell = to_stamp),
-  page_q90 = reactable::colDef(name = "Q90", cell = to_stamp),
-  page_q95 = reactable::colDef(name = "Q95", cell = to_stamp),
-  page_median_RS = reactable::colDef(name = "Median", cell = to_stamp, show = FALSE),
-  page_q90_RS = reactable::colDef(name = "Q90", cell = to_stamp, show = FALSE),
-  page_q95_RS = reactable::colDef(name = "Q95", cell = to_stamp, show = FALSE),
-  page_median_FS = reactable::colDef(name = "Median", cell = to_stamp, show = FALSE),
-  page_q90_FS = reactable::colDef(name = "Q90", cell = to_stamp, show = FALSE),
-  page_q95_FS = reactable::colDef(name = "Q95", cell = to_stamp, show = FALSE),
+  page_median = reactable::colDef(name = "Median", cell = function(value) eatPrepTBA:::tostamp(value)),
+  page_q90 = reactable::colDef(name = "Q90", cell = function(value) eatPrepTBA:::tostamp(value)),
+  page_q95 = reactable::colDef(name = "Q95", cell = function(value) eatPrepTBA:::tostamp(value)),
+  page_median_RS = reactable::colDef(name = "Median", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
+  page_q90_RS = reactable::colDef(name = "Q90", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
+  page_q95_RS = reactable::colDef(name = "Q95", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
+  page_median_FS = reactable::colDef(name = "Median", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
+  page_q90_FS = reactable::colDef(name = "Q90", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
+  page_q95_FS = reactable::colDef(name = "Q95", cell = function(value) eatPrepTBA:::tostamp(value), show = FALSE),
   item_id = reactable::colDef(name = "Item", style = sort_function,
                    cell = function(value) htmltools::tags$code(value),
-                   width = 120
-  )
+                   width = 120)
 )
 
 no_show_list <- c(
@@ -124,17 +101,17 @@ colUnit <- function(data, id) {
     ),
     unit_estimated = reactable::colDef(
       name = "a-priori",
-      cell = to_stamp,
+      cell = to_stamp(value),
       style = sort_function
     ),
     unit_diff = reactable::colDef(
       name = "Differenz Q90",
-      cell = to_stamp,
+      cell = to_stamp(value),
       style = sort_function
     ),
     unit_diff95 = reactable::colDef(
       name = "Differenz Q95",
-      cell = to_stamp,
+      cell = to_stamp(value),
       style = sort_function
     ),
     
@@ -147,25 +124,25 @@ colUnit <- function(data, id) {
     ),
     unit_q90 = reactable::colDef(
       name = "Q90",
-      cell = to_stamp,
+      cell = to_stamp(value),
       style = sort_function
     ),
     unit_q95 = reactable::colDef(
       name = "Q95",
-      cell = to_stamp,
+      cell = to_stamp(value),
       style = sort_function
     ),
     
     # Regelschulwerte
     unit_diff_RS = reactable::colDef(
       name = "Differenz Q90",
-      cell = to_stamp,
+      cell = to_stamp(value),
       show = FALSE,
       style = sort_function
     ),
     unit_diff95_RS = reactable::colDef(
       name = "Differenz Q95",
-      cell = to_stamp,
+      cell = to_stamp(value),
       show = FALSE,
       style = sort_function
     ),
@@ -178,13 +155,13 @@ colUnit <- function(data, id) {
     ),
     unit_q90_RS = reactable::colDef(
       name = "Q90",
-      cell = to_stamp,
+      cell = to_stamp(value),
       show = FALSE,
       style = sort_function
     ),
     unit_q95_RS = reactable::colDef(
       name = "Q95",
-      cell = to_stamp,
+      cell = to_stamp(value),
       show = FALSE,
       style = sort_function
     ),
@@ -192,13 +169,13 @@ colUnit <- function(data, id) {
     # Förderschulwerte
     unit_diff_FS = reactable::colDef(
       name = "Differenz Q90",
-      cell = to_stamp,
+      cell = to_stamp(value),
       show = FALSE,
       style = sort_function
     ),
     unit_diff95_FS = reactable::colDef(
       name = "Differenz Q95",
-      cell = to_stamp,
+      cell = to_stamp(value),
       show = FALSE,
       style = sort_function
     ),
@@ -211,13 +188,13 @@ colUnit <- function(data, id) {
     ),
     unit_q90_FS = reactable::colDef(
       name = "Q90",
-      cell = to_stamp,
+      cell = to_stamp(value),
       show = FALSE,
       style = sort_function
     ),
     unit_q95_FS = reactable::colDef(
       name = "Q95",
-      cell = to_stamp,
+      cell = to_stamp(value),
       show = FALSE,
       style = sort_function
     )
