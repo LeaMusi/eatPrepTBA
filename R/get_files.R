@@ -1,3 +1,4 @@
+#' @importFrom methods setGeneric
 setGeneric("get_files", function(workspace,
                                  id = NULL,
                                  type,
@@ -8,6 +9,8 @@ setGeneric("get_files", function(workspace,
   standardGeneric("get_files")
 })
 
+#' @importFrom dplyr intersect setdiff
+#' @importFrom methods setMethod signature
 setMethod("get_files",
           signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace,
@@ -53,6 +56,8 @@ setMethod("get_files",
             return(ws_files_tbl)
           })
 
+#' @importFrom dplyr intersect setdiff
+#' @importFrom methods setMethod signature
 setMethod("get_files",
           signature = signature(workspace = "WorkspaceStudio"),
           function(workspace,

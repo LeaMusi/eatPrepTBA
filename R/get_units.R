@@ -13,6 +13,7 @@
 #'
 #' @aliases
 #' get_units,WorkspaceTestcenter-method,WorkspaceStudio-method
+#' @importFrom methods setGeneric
 setGeneric("get_units", function(workspace,
                                  units = NULL,
                                  metadata = TRUE,
@@ -21,6 +22,7 @@ setGeneric("get_units", function(workspace,
 })
 
 #' @describeIn get_units Get multiple unit information and coding schemes in a given Studio workspace
+#' @importFrom methods setMethod signature
 setMethod("get_units",
           signature = signature(workspace = "WorkspaceStudio"),
           function(workspace,
@@ -183,6 +185,7 @@ setMethod("get_units",
             return(units_final)
           })
 
+#' @importFrom dplyr any_of
 read_units <- function(ws, ws_id) {
   if (length(ws) == 0) {
     return(tibble::tibble(ws_id = ws_id))

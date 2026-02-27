@@ -9,6 +9,7 @@
 #'
 #' @return A tibble.
 #' @export
+#' @importFrom dplyr setdiff
 add_coding_scheme <- function(units, filter_has_codes = TRUE, overwrite = FALSE) {
   cli_setting()
 

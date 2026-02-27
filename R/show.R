@@ -1,3 +1,4 @@
+#' @importFrom methods setMethod
 setMethod(f = "show",
           signature = "LoginStudio",
           definition = function(object) {
@@ -20,6 +21,7 @@ setMethod(f = "show",
             cli::cli_end(ul)
           })
 
+#' @importFrom methods setMethod
 setMethod(f = "show",
           signature = "LoginTestcenter",
           definition = function(object) {
@@ -35,6 +37,7 @@ setMethod(f = "show",
             cli::cli_end(ul)
           })
 
+#' @importFrom methods setMethod
 setMethod(f = "show",
           signature = "WorkspaceStudio",
           definition = function(object) {
@@ -51,6 +54,7 @@ setMethod(f = "show",
             cli::cli_end(ul)
           })
 
+#' @importFrom methods setMethod
 setMethod(f = "show",
           signature = "WorkspaceTestcenter",
           definition = function(object) {

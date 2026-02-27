@@ -45,6 +45,7 @@ None; saves tables, including quantile dot plots, ready for using in quarto docu
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 Takes various data sources with unit, item and participant stay times and metadata,
 and computes quantiles for use in reports. Uses the layout_staytime_tables function
 to layout them for quarto reports.

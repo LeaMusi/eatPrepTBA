@@ -12,6 +12,7 @@
 #' @rdname Login-class
 #'
 #' @export
+#' @importFrom methods setClass
 setClass("Login",
          slots = c(
            base_url = "character",
@@ -38,6 +39,7 @@ setClass("Login",
 #' @rdname LoginStudio-class
 #'
 #' @export
+#' @importFrom methods setClass
 setClass("LoginStudio",
          contains = "Login",
          slots = c(
@@ -61,6 +63,7 @@ setClass("LoginStudio",
 #' @rdname LoginTestcenter-class
 #'
 #' @export
+#' @importFrom methods setClass
 setClass("LoginTestcenter",
          contains = "Login")
 
@@ -76,6 +79,7 @@ setClass("LoginTestcenter",
 #' @rdname Workspace-class
 #'
 #' @export
+#' @importFrom methods setClass
 setClass("Workspace",
          slots = c(
            ws_id = "numeric",
@@ -97,6 +101,7 @@ setClass("Workspace",
 #' @rdname WorkspaceStudio-class
 #'
 #' @export
+#' @importFrom methods setClass
 setClass("WorkspaceStudio",
          contains = c("Workspace"),
          slots = c(
@@ -118,6 +123,7 @@ setClass("WorkspaceStudio",
 #' @rdname WorkspaceTestcenter-class
 #'
 #' @export
+#' @importFrom methods setClass
 setClass("WorkspaceTestcenter",
          contains = c("Workspace"),
          slots = c(

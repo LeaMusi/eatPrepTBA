@@ -11,6 +11,7 @@
 #' @return A tibble.
 #'
 #' @export
+#' @importFrom dplyr intersect
 prepare_logs <- function(logs, log_events = NULL) {
   all_events <-
     c("current_unit_id",

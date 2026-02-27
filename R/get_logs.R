@@ -12,11 +12,13 @@
 #'
 #' @aliases
 #' get_logs,WorkspaceTestcenter-method
+#' @importFrom methods setGeneric
 setGeneric("get_logs", function(workspace, groups = NULL) {
   standardGeneric("get_logs")
 })
 
 #' @describeIn get_logs Get responses of a given Testcenter workspace
+#' @importFrom methods setMethod signature
 setMethod("get_logs",
           signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace, groups = NULL) {

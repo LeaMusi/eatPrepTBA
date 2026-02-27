@@ -11,6 +11,7 @@
 #'
 #' @return A tibble.
 #' @export
+#' @importFrom dplyr intersect
 complete_design <- function(coded,
                             units,
                             design,

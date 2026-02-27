@@ -10,11 +10,13 @@
 #'
 #' @aliases
 #' get_results,WorkspaceTestcenter-method
+#' @importFrom methods setGeneric
 setGeneric("get_results", function(workspace) {
   standardGeneric("get_results")
 })
 
 #' @describeIn get_results Get results of a given Testcenter workspace
+#' @importFrom methods setMethod signature
 setMethod("get_results",
           signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace) {

@@ -10,6 +10,7 @@
 #' Returns estimated stay times for units and unit pages.
 #'
 #' @export
+#' @importFrom dplyr setdiff
 estimate_unit_times <- function(logs) {
   cli_setting()
 

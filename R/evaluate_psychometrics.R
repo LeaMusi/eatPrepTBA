@@ -466,6 +466,7 @@ concatenate_character <- function(value, collapse = ";;;", wrap_start = "[[[", w
   })
 }
 
+#' @importFrom stats cor
 category_correlation <- function(data, identifiers, input_name = "code_id", output_name = "code_id", output_value = "code_pbc") {
   data %>%
     dplyr::mutate(

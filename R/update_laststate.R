@@ -20,6 +20,7 @@ laststates_lookup <-
   )
 
 
+#' @importFrom dplyr intersect
 update_laststate <- function(information, current_states) {
   # Always return the highest available state
   intersect(laststates_lookup[[information]], current_states)[1]

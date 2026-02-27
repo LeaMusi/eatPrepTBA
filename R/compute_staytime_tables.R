@@ -25,12 +25,17 @@
 #'
 #' @description
 #' `r lifecycle::badge("experimental")`
+#' 
 #' Takes various data sources with unit, item and participant stay times and metadata,
 #' and computes quantiles for use in reports. Uses the layout_staytime_tables function
 #' to layout them for quarto reports.
 #'
 #' @export
 
+#' @importFrom dplyr anti_join case_when coalesce rename semi_join
+#' @importFrom stats complete.cases median na.omit quantile
+#' @importFrom stringr str_detect str_to_upper
+#' @importFrom tidyr starts_with unnest
 compute_staytime_tables <- function(fach,
                                     log_times,
                                     unit_domains,
@@ -59,7 +64,7 @@ compute_staytime_tables <- function(fach,
     units_cs %>%
     unnest(unit_codes, keep_empty = TRUE)
   
-  # Korrektur für die Markieritems
+  # Korrektur fuer die Markieritems
   units_cs_corrected <-
     units_cs %>%
     dplyr::mutate(
@@ -258,9 +263,9 @@ compute_staytime_tables <- function(fach,
     dplyr::select(ws_id, unit_id, unit_key, unit_label, 
            item_id, variable_id,
            Aufgabenzeit, Textsorte, Wortanzahl, Entwickler_in,
-           Itemformat, Geschätzte_GeR_Niveaustufe_a_priori, Lese_Hörstil) %>% 
+           Itemformat, Geschaetzte_GeR_Niveaustufe_a_priori, Lese_Hoerstil) %>% 
     dplyr::mutate(
-      # Achtung: Dieser Link sollte der künftige Link zum ÜA-Bereich werden
+      # Achtung: Dieser Link sollte der kuenftige Link zum UeA-Bereich werden
       link = stringr::str_glue("https://www.iqb-studio.de/#/a/{ws_id}/{unit_id}/preview"),
       link_legacy = stringr::str_glue("https://www.iqb-studio.de/#/a/{ws_id}/{unit_id}/preview")
     )
@@ -365,7 +370,7 @@ compute_staytime_tables <- function(fach,
         tab <-
           data %>%
           dplyr::distinct(link, dplyr::across(starts_with("unit")), SPF) %>%
-          layout_staytime_table(id = "unit-table")
+          layout_staytime_tables(id = "unit-table")
         
         # Items
         tab_item <-
@@ -373,7 +378,7 @@ compute_staytime_tables <- function(fach,
           dplyr::arrange(unit_key, variable_page, item_id) %>%
           dplyr::mutate(variable_page = variable_page + 1) %>%
           # dplyr::distinct(link, dplyr::across(starts_with("unit")), SPF) %>%
-          layout_staytime_table(id = "item-table")
+          layout_staytime_tables(id = "item-table")
         
         save(tab, tab_item, file = stringr::str_glue("output/tab_{domain}.RData"))
         
@@ -406,7 +411,7 @@ compute_staytime_tables <- function(fach,
   # 
   # ggsave("figures/D5.svg", width = 6000, height = 4000, units = "px")  
   
-  # ### Extraktion für Janine und Pauline
+  # ### Extraktion fuer Janine und Pauline
   # pilot25_stim_times <-
   #   unit_page_logtimes %>%
   #   rename(variable_page = page_id) %>%

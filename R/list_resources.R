@@ -11,11 +11,13 @@
 #'
 #' @aliases
 #' list_resources,WorkspaceTestcenter-method
+#' @importFrom methods setGeneric
 setGeneric("list_resources", function(workspace) {
   standardGeneric("list_resources")
 })
 
 #' @describeIn list_resources List all resources in a given IQB Testcenter workspace
+#' @importFrom methods setMethod signature
 setMethod("list_resources",
           signature = signature(workspace = "Workspace"),
           function(workspace) {

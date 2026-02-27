@@ -9,6 +9,7 @@
 #' @return A testtakers XML.
 #'
 #' @export
+#' @importFrom dplyr setdiff
 generate_testtakers <- function(testtakers,
                                 custom_texts = NULL,
                                 profiles = NULL,

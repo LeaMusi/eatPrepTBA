@@ -27,6 +27,7 @@
 #'
 
 
+#' @importFrom dplyr setdiff
 test_coding_scheme <- function(data, exceptions = list(), name_list = FALSE, console = FALSE) {
 
   # Initialisierung ------------------------------------------------------------

@@ -14,7 +14,7 @@ complete_design(
 )
 }
 \arguments{
-\item{coded}{Tibble. Response data coded with \code{\link[=code_responses]{code_responses()}}. The argument \code{prepare} must be \code{TRUE}.}
+\item{coded}{Tibble. Response data coded with \code{\link[eatAutoCode:code_responses]{eatAutoCode::code_responses()}}. The argument \code{prepare} must be \code{TRUE}.}
 
 \item{units}{Tibble. Unit data retrieved from the IQB Studio after setting the argument \code{unit_definition = TRUE} for \code{\link[=get_units]{get_units()}} -- otherwise the page order of variables could not be correctly inferred from the variable source tree. Could already be treated by \code{\link[=add_coding_scheme]{add_coding_scheme()}} to save some time.}
 

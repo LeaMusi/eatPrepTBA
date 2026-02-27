@@ -138,6 +138,7 @@ read_items_profiles <- function(unit_metadata) {
   return(items_profiles)
 }
 
+#' @importFrom dplyr any_of
 read_items_list <- function(unit_metadata) {
   if (!is.null(unit_metadata$items) && length(purrr::compact(unit_metadata$items)) != 0) {
     items_list <-

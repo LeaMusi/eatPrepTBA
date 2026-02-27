@@ -11,11 +11,13 @@
 #'
 #' @aliases
 #' list_booklets,WorkspaceTestcenter-method
+#' @importFrom methods setGeneric
 setGeneric("list_booklets", function(workspace) {
   standardGeneric("list_booklets")
 })
 
 #' @describeIn list_booklets List all booklets in a given IQB Testcenter workspace
+#' @importFrom methods setMethod signature
 setMethod("list_booklets",
           signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace) {

@@ -12,6 +12,7 @@
 #' get_booklets,WorkspaceTestcenter-method
 #'
 #' @keywords internal
+#' @importFrom methods setGeneric
 setGeneric("get_booklets", function(workspace, files = NULL) {
   cli_setting()
 
@@ -21,6 +22,8 @@ setGeneric("get_booklets", function(workspace, files = NULL) {
 #' @param workspace [WorkspaceTestcenter-class]. Workspace information necessary to retrieve unit information and resources from the API.
 #'
 #' @describeIn get_booklets Get booklets in a Testcenter workspace
+#' @importFrom dplyr setdiff
+#' @importFrom methods setMethod signature
 setMethod("get_booklets",
           signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace,
