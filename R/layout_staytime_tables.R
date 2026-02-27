@@ -59,7 +59,7 @@ layout_staytime_tables <- function(data,
     purrr::map(function(x) reactable::colDef(show = FALSE)) %>%
     purrr::set_names(no_show_list)
   
-  unit_cols <- colUnit(data, id)
+  unit_cols <- colUnit(data)
   
   columns <- c(
     unit_cols,
@@ -67,7 +67,7 @@ layout_staytime_tables <- function(data,
     colNoShow
   )
   
-  # unit_cols <- colUnit(data_table, id)
+  # unit_cols <- colUnit(data_table)
   
   columns_filter <-
     columns %>% keep(imap_lgl(., function(x, i) i %in% names(data)))
