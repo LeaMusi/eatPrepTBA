@@ -166,19 +166,18 @@ estimate_unit_times <- function(logs) {
         is_max_ts = ts == max(ts)
       ) %>%
       dplyr::filter(
-        ts_name %>% stringr::str_detect("^page_") | ts_name == "unit_start_ts" | is_max_ts
+        ts_name %>% stringr::str_detect("^page_") | ts_name == "unit_load_ts" | ts_name == "session_end_ts"
       ) %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(c(groups_booklet)))) %>%
       dplyr::arrange("ts", by_group=TRUE) %>%  
       dplyr::mutate(
-        ts_prev = dplyr::lag(ts),
         ts_next = dplyr::lead(ts),
         page_time = ts_next - ts
         # ts = ifelse(ts_name == "page_start_ts", ts, ts_next)
       ) %>%
-      dplyr::group_by(dplyr::across(groups_unit)) %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of(c(groups_unit)))) %>%
       dplyr::filter(
-        ts_name != "unit_current_ts" & ts_name != "unit_start_ts" # These are only
+        ts_name != "unit_current_ts" & ts_name != "unit_load_ts" # These are only
         # used as endpoint of last page
       ) %>%
       # The first page is not logged before completion...
@@ -206,7 +205,7 @@ estimate_unit_times <- function(logs) {
       dplyr::summarise(
         page_start_time = min(ts),
         page_n_start = length(page_time),
-        page_time = sum(page_time),
+        page_time = sum(page_time, na.rm=TRUE),
         .groups = "drop"
       ) %>%
       dplyr::left_join(
@@ -221,7 +220,7 @@ estimate_unit_times <- function(logs) {
     unit_logs <- unit_logs %>%
       dplyr::left_join(
         unit_page_logs,
-        by = dplyr::join_by(!!! groups_unit)
+        by = groups_unit
       ) %>%
       dplyr::mutate(
         unit_has_pages = purrr::map_lgl(unit_page_logs, function(x) !is.null(x))

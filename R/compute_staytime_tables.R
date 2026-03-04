@@ -114,7 +114,8 @@ compute_staytime_tables <- function(fach,
   stim_logs_quant <-
     unit_page_logtimes %>%
     rename(variable_page = page_id) %>%
-    anti_join(resp_page_logtimes) %>% # select leftover page logtimes not in resp_page_logtimes
+    anti_join(resp_page_logtimes) %>% # select leftover page logtimes not in resp_page_logtimes, 
+    # i. e. pages without item IDs
     semi_join(resp_page_logtimes %>% dplyr::distinct(group_id, login_name, login_code, 
                                               booklet_id, unit_key)) %>% # select only those use
     # combinations which appear in resp_page_logtimes
@@ -255,15 +256,17 @@ compute_staytime_tables <- function(fach,
   # Irrelevante Units rausschmeißen:
   unit_meta <- unit_meta[which(unit_meta$unit_key %in% unit_domains$unit_key), ]
   
+  select_cols <- c("ws_id", "unit_id", "unit_key", "unit_label", 
+  "item_id", "variable_id",
+  "Aufgabenzeit", "Textsorte", "Wortanzahl", "Entwickler_in",
+  "Itemformat", "Gesch\u00E4tzte_GeR_Niveaustufe_a_priori", "Lese_H\u00F6rstil")
+  
   unit_meta <- 
     unit_meta %>% 
     dplyr::select(ws_id, unit_id, unit_key, unit_label, unit_metadata, item_metadata) %>% 
     unnest(unit_metadata) %>%
     unnest(item_metadata) %>% 
-    dplyr::select(ws_id, unit_id, unit_key, unit_label, 
-           item_id, variable_id,
-           Aufgabenzeit, Textsorte, Wortanzahl, Entwickler_in,
-           Itemformat, Geschaetzte_GeR_Niveaustufe_a_priori, Lese_Hoerstil) %>% 
+    dplyr::select(matches(str_c(select_cols, collapse = "|"))) %>% 
     dplyr::mutate(
       # Achtung: Dieser Link sollte der kuenftige Link zum UeA-Bereich werden
       link = stringr::str_glue("https://www.iqb-studio.de/#/a/{ws_id}/{unit_id}/preview"),
