@@ -1,25 +1,33 @@
-#' Estimates stay times from log data
+#' Berechnet Bearbeitungs- und Ladezeiten anhand der Logdaten
 #'
 #' @param logs Tibble. Must be a logs tibble retrieved with `get_logs()` or `read_logs()`.
 #'
-#' @return Contains the estimated stay times of units and pages.
+#' @return Data frame mit diversen Zeiten und Zeitstempeln pro Unit bzw. Seite
 #'
 #' @description
 #' `r lifecycle::badge("experimental")`
 #'
-#' Returns estimated stay times for units and unit pages.
+#' Berechnet geschätzte Bearbeitungs- und Ladezeiten für Units und Seiten.
+#' - loading_time: Zeitspanne zwischen LOADING und RUNNING des Players pro Abspielung des Units
+#' - unit_time: Zeitspanne zwischen RUNNING des Players und dem nächsten Zeitstempel 
+#'            (meist LOADING des nächsten Units, manchmal Sitzungsende), pro Abspielung des Units
+#' - unit_n_play: Anzahl der Abspielungen des Units in dieser Session
+#' - n_loadings: Anzahl der Ladeversuche des Units (summiert über die Abspielungen,
+#'            und über erfolgreiche und erfolgslose Ladeversuche)
+#' - page_time: Zeitspanne zwischen CURRENT_PAGE_ID = [...] (Ladeabschluss der Seite) und
+#'            Ladeabschluss der nächsten Seite bzw. bis Sitzungsende
+#' - run_no_load_i: Player wurde als RUNNING, aber vorher nicht als LOADING geloggt.
+#'                  In diesem Fall wurden Ladezeiten nicht berechnet.
+#'                  
+#' Daten gruppiert nach Gruppe, Login, Booklet, Unit_key.
 #'
 #' @export
 #' @importFrom dplyr setdiff
 
-# TODO: Loading times in Fällen berechnen, in denen mehrmals hintereinander dasselbe 
-# Unit versucht wurde zu laden. 
-# Derzeit wird nur der letzte (und erfolgreiche) Ladeversuch beachtet.
-
 estimate_unit_times <- function(logs) {
   cli_setting()
   groups_booklet <- setdiff(names(logs), c("unit_key", "unit_alias", "ts", "log_entry"))
-  groups_unit <- setdiff(names(logs), c("ts", "log_entry"))
+  groups_unit <- setdiff(names(logs), c("ts", "log_entry", "unit_alias"))
   
   all_logs <-
     logs %>%
@@ -77,7 +85,6 @@ estimate_unit_times <- function(logs) {
       )
     )
   
-  
   all_ts <- all_ts %>%
     # dplyr::group_by(dplyr::across(dplyr::all_of(c(groups_unit, "ts_name")))) %>%
     # dplyr::mutate(
@@ -103,25 +110,58 @@ estimate_unit_times <- function(logs) {
     all_ts %>%
     dplyr::filter(
       ts_name == "unit_start_ts" | ts_name == "unit_load_ts" | ts_name == "session_end_ts"
-    ) %>%
+    )  %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(groups_booklet))) %>%
+    dplyr::arrange("ts", by_group=TRUE)
+
+  # Nach wiederholten Ladeversuchen suchen
+  duplicate_loadings <- lapply(2:nrow(unit_logs_prep), function(i) { 
+    return(as.logical(unit_logs_prep[i, "log_entry"] == "PLAYER = LOADING" &
+                        unit_logs_prep[i-1, "log_entry"] == "PLAYER = LOADING" &
+                        unit_logs_prep[i, "unit_key"] == unit_logs_prep[i-1, "unit_key"]))})
+  unit_logs_prep$duplicate_loadings <- FALSE
+  unit_logs_prep$duplicate_loadings[2:nrow(unit_logs_prep)] <- duplicate_loadings
+  unit_logs_prep$duplicate_loadings <- lapply(unit_logs_prep$duplicate_loadings, as.logical)
+  
+  mult_loadings <-
+    unit_logs_prep %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(groups_unit))) %>%
+    dplyr::summarise( # Adds up all loading attempts from various unit plays
+      n_loadings = sum(duplicate_loadings==TRUE),
+      .groups = "drop"
+    )
+  
+  # Nach Unit-Starts ohne vorheriges Laden suchen 
+  run_no_load <- lapply(2:nrow(unit_logs_prep), function(i) { 
+    return(as.logical(unit_logs_prep[i, "log_entry"] == "PLAYER = RUNNING" &
+                        (unit_logs_prep[i-1, "log_entry"] != "PLAYER = LOADING" |
+                        unit_logs_prep[i, "unit_key"] != unit_logs_prep[i-1, "unit_key"])))})
+  unit_logs_prep$run_no_load <- FALSE
+  unit_logs_prep$run_no_load[2:nrow(unit_logs_prep)] <- run_no_load
+  unit_logs_prep$run_no_load <- lapply(unit_logs_prep$run_no_load, as.logical)
+  
+  unit_logs_prep <- unit_logs_prep %>%
+    dplyr::filter(duplicate_loadings == "FALSE") %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(groups_booklet))) %>%
     dplyr::arrange("ts", by_group=TRUE) %>%  
     dplyr::mutate(
       ts_next = dplyr::lead(ts),
-      unit_time = ts_next - ts # Unit time hier definiert als Zeitspanne von Unit RUNNING 
+      unit_time = ts_next - ts, # Unit time hier definiert als Zeitspanne von Unit RUNNING 
       # bis zur nächsten Aktion innerhalb des Booklets
-    ) %>%
-    dplyr::ungroup() %>%
-    dplyr::group_by(dplyr::across(dplyr::all_of(groups_unit))) %>%
-    dplyr::arrange("ts", by_group=TRUE) %>%
-    dplyr::mutate(
       ts_prev = dplyr::lag(ts),
-      unit_loadtime = ts - ts_prev # Unit Loadtime hier definiert als Zeitspanne von der 
-      # letzten Aktion innerhalb des Units 
-      # (fast immer LOADING) bis zum Unit RUNNING. D. h. nur der letzte (erfolgreiche) 
-      # Ladeversuch wird gezählt.
+      unit_loadtime = ts - ts_prev # Unit Loadtime hier definiert als Zeitspanne von 
+      # letztem PLAYER=LOADING bis zu PLAYER=RUNNING
     ) %>%
-    dplyr::filter(ts_name %in% c("unit_start_ts")) %>%
+    dplyr::mutate(
+      unit_loadtime = dplyr::case_when(
+        run_no_load == "TRUE" ~ NA, .default = unit_loadtime
+      ), # Ladezeiten löschen, wenn vor RUNNING kein LOADING kam
+        ts_prev = dplyr::case_when(
+        run_no_load == "TRUE" ~ NA, .default = ts_prev # Dasselbe für ts_prev
+      )) %>%
+    dplyr::filter(ts_name =="unit_start_ts") %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(groups_unit))) %>%
+    dplyr::arrange("ts", by_group=TRUE) %>% 
     dplyr::mutate(
       unit_start_i = seq_along(unit_time)
     )
@@ -135,27 +175,32 @@ estimate_unit_times <- function(logs) {
                                   "unit_start_time_i" = "ts",
                                   "unit_end_time_i" = "ts_next",
                                   "unit_loadtime_i" = "unit_loadtime",
-                                  "unit_loadstart_i" = "ts_prev"))) %>%
+                                  "unit_loadstart_i" = "ts_prev",
+                                  "run_no_load_i" = "run_no_load"))) %>%
     tidyr::nest(
-      unit_logs_i = c("unit_start_i", "unit_time_i", "unit_end_time_i", 
-                      "unit_start_time_i", "unit_loadtime_i", "unit_loadstart_i")
-    )
+      unit_logs_i = c("unit_start_i", "unit_time_i", "unit_end_time_i", "unit_start_time_i", 
+                      "unit_loadtime_i", "unit_loadstart_i", "run_no_load_i"))
   
-  # Total start and stay times
+  # Bring stats together
   unit_logs <-
     unit_logs_prep %>%
     dplyr::summarise(
       unit_start_time = min(ts),
       unit_n_play = length(unit_time),
-      unit_time = sum(unit_time, na.rm = TRUE), # Ohne Ladezeiten
-      all_load_time =  sum(unit_loadtime, na.rm = TRUE), #Reine Ladezeiten (ohne 
-      # erfolglose Ladeversuche)
+      unit_time = sum(unit_time, na.rm = TRUE),
+      unit_loadtime =  sum(unit_loadtime, na.rm = TRUE),
       .groups = "drop"
     ) %>%
     dplyr::left_join(
       unit_logs_starts,
       by = dplyr::join_by(!!! groups_unit)
+    ) %>%
+    dplyr::left_join(
+      mult_loadings,
+      by = dplyr::join_by(!!! groups_unit)
     )
+  
+  unit_logs$n_loadings <- unit_logs$n_loadings + unit_logs$unit_n_play
   
   # Page times
   if (any(!is.na(all_ts$page_id))) {
