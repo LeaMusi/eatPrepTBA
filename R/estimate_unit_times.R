@@ -20,6 +20,8 @@
 #'                  In diesem Fall wurden Ladezeiten nicht berechnet.
 #'                  
 #' Daten gruppiert nach Gruppe, Login, Booklet, Unit_key.
+#' Achtung: unit_alias wird hier nicht beachtet und es wird nicht danach gruppiert
+#' oder sortiert, es wird nur am Ende als Information wieder eingefügt.
 #'
 #' @export
 #' @importFrom dplyr setdiff
@@ -114,15 +116,21 @@ estimate_unit_times <- function(logs) {
     dplyr::group_by(dplyr::across(dplyr::all_of(groups_booklet))) %>%
     dplyr::arrange("ts", by_group=TRUE)
 
-  # Nach wiederholten Ladeversuchen suchen
-  duplicate_loadings <- lapply(2:nrow(unit_logs_prep), function(i) { 
-    return(as.logical(unit_logs_prep[i, "log_entry"] == "PLAYER = LOADING" &
-                        unit_logs_prep[i-1, "log_entry"] == "PLAYER = LOADING" &
-                        unit_logs_prep[i, "unit_key"] == unit_logs_prep[i-1, "unit_key"]))})
+  # Nach wiederholten Ladeversuchen, und Unit-Starts ohne vorheriges Laden suchen
+  print("Finde wiederholte Ladeversuche, sowie Unit-Starts ohne vorheriges Laden")
   unit_logs_prep$duplicate_loadings <- FALSE
-  unit_logs_prep$duplicate_loadings[2:nrow(unit_logs_prep)] <- duplicate_loadings
-  unit_logs_prep$duplicate_loadings <- lapply(unit_logs_prep$duplicate_loadings, as.logical)
-  
+  unit_logs_prep$run_no_load <- FALSE
+  pb = utils::txtProgressBar(min = 0, max = nrow(unit_logs_prep), initial = 2) 
+  for (row in 2:nrow(unit_logs_prep)) {
+    unit_logs_prep$duplicate_loadings[[row]] <- (unit_logs_prep[row, "log_entry"] == "PLAYER = LOADING" &
+                                            unit_logs_prep[row-1, "log_entry"] == "PLAYER = LOADING" &
+                                            unit_logs_prep[row, "unit_key"] == unit_logs_prep[row-1, "unit_key"])
+    unit_logs_prep$run_no_load[[row]] <- (unit_logs_prep[row, "log_entry"] == "PLAYER = RUNNING" &
+                                            (unit_logs_prep[row-1, "log_entry"] != "PLAYER = LOADING" |
+                                               unit_logs_prep[row, "unit_key"] != unit_logs_prep[row-1, "unit_key"]))
+    utils::setTxtProgressBar(pb,row)
+  }
+
   mult_loadings <-
     unit_logs_prep %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(groups_unit))) %>%
@@ -130,18 +138,9 @@ estimate_unit_times <- function(logs) {
       n_loadings = sum(duplicate_loadings==TRUE),
       .groups = "drop"
     )
-  
-  # Nach Unit-Starts ohne vorheriges Laden suchen 
-  run_no_load <- lapply(2:nrow(unit_logs_prep), function(i) { 
-    return(as.logical(unit_logs_prep[i, "log_entry"] == "PLAYER = RUNNING" &
-                        (unit_logs_prep[i-1, "log_entry"] != "PLAYER = LOADING" |
-                        unit_logs_prep[i, "unit_key"] != unit_logs_prep[i-1, "unit_key"])))})
-  unit_logs_prep$run_no_load <- FALSE
-  unit_logs_prep$run_no_load[2:nrow(unit_logs_prep)] <- run_no_load
-  unit_logs_prep$run_no_load <- lapply(unit_logs_prep$run_no_load, as.logical)
-  
+
+  print("Berechne Unit-Bearbeitungs- und Ladezeiten")
   unit_logs_prep <- unit_logs_prep %>%
-    dplyr::filter(duplicate_loadings == "FALSE") %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(groups_booklet))) %>%
     dplyr::arrange("ts", by_group=TRUE) %>%  
     dplyr::mutate(
@@ -154,10 +153,10 @@ estimate_unit_times <- function(logs) {
     ) %>%
     dplyr::mutate(
       unit_loadtime = dplyr::case_when(
-        run_no_load == "TRUE" ~ NA, .default = unit_loadtime
+        run_no_load == TRUE ~ NA, .default = unit_loadtime
       ), # Ladezeiten löschen, wenn vor RUNNING kein LOADING kam
         ts_prev = dplyr::case_when(
-        run_no_load == "TRUE" ~ NA, .default = ts_prev # Dasselbe für ts_prev
+        run_no_load == TRUE ~ NA, .default = ts_prev # Dasselbe für ts_prev
       )) %>%
     dplyr::filter(ts_name =="unit_start_ts") %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(groups_unit))) %>%
@@ -204,6 +203,7 @@ estimate_unit_times <- function(logs) {
   
   # Page times
   if (any(!is.na(all_ts$page_id))) {
+    print("Berechne Seiten-Bearbeitungszeiten")
     unit_page_logs_prep <-
       all_ts %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(c(groups_booklet, "unit_key")))) %>%
@@ -228,7 +228,7 @@ estimate_unit_times <- function(logs) {
       # The first page is not logged before completion...
       tidyr::fill(page_id, .direction = "up") %>%
       dplyr::filter(!is.na(page_id)) %>%
-      dplyr::group_by(dplyr::across(c(groups_unit, "page_id"))) %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of(c(groups_unit, "page_id")))) %>%
       dplyr::mutate(
         page_start_i = seq_along(page_time)
       )
@@ -236,7 +236,8 @@ estimate_unit_times <- function(logs) {
     # Separate Unit start and stay times
     unit_page_logs_start <-
       unit_page_logs_prep %>%
-      dplyr::select(dplyr::all_of(c(groups_unit, "page_id",
+      dplyr::select(dplyr::all_of(c(groups_unit, 
+                                    "page_id",
                                     "page_start_i",
                                     "page_time_i" = "page_time",
                                     "page_start_time_i" = "ts",
@@ -270,6 +271,14 @@ estimate_unit_times <- function(logs) {
       dplyr::mutate(
         unit_has_pages = purrr::map_lgl(unit_page_logs, function(x) !is.null(x))
       )
+    
+  } else {
+    print("Keine Seiten-IDs; Seiten-Bearbeitungszeiten werden nicht berechnet")
   }
+  unit_logs <- unit_logs %>%
+    dplyr::left_join(
+      all_ts %>% dplyr::select(c(groups_unit, "unit_alias")),
+      by = groups_unit,
+      multiple = "any")
   return(unit_logs)
 }

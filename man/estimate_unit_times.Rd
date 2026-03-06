@@ -30,4 +30,6 @@ In diesem Fall wurden Ladezeiten nicht berechnet.
 }
 
 Daten gruppiert nach Gruppe, Login, Booklet, Unit_key.
+Achtung: unit_alias wird hier nicht beachtet und es wird nicht danach gruppiert
+oder sortiert, es wird nur am Ende als Information wieder eingefügt.
 }
