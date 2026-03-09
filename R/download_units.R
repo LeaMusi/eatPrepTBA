@@ -18,7 +18,7 @@
 #'
 #' @aliases
 #' download_units,WorkspaceStudio-method
-#' @importFrom methods setGeneric
+
 setGeneric("download_units", function(workspace,
                                       path,
                                       unit_keys = NULL,
@@ -32,7 +32,6 @@ setGeneric("download_units", function(workspace,
   standardGeneric("download_units")
 })
 
-#' @importFrom methods setMethod signature
 setMethod("download_units",
           signature = signature(workspace = "WorkspaceStudio"),
           function(workspace,

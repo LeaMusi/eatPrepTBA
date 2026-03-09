@@ -22,11 +22,6 @@
 #'
 #' @export
 
-#' @importFrom dplyr intersect
-#' @importFrom purrr imap_lgl keep
-#' @importFrom reactable reactable
-#' @importFrom shiny div icon
-
 layout_staytime_tables <- function(data,
                                id = "unit-table",
                                subject = "dep",

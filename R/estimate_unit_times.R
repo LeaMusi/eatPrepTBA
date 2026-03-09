@@ -24,7 +24,8 @@
 #' oder sortiert, es wird nur am Ende als Information wieder eingefügt.
 #'
 #' @export
-#' @importFrom dplyr setdiff
+
+#TODO: Ermittlung von doppelten Ladeversuchen etc. schneller machen
 
 estimate_unit_times <- function(logs) {
   cli_setting()

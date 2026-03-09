@@ -32,10 +32,6 @@
 #'
 #' @export
 
-#' @importFrom dplyr anti_join case_when coalesce rename semi_join
-#' @importFrom stats complete.cases median na.omit quantile
-#' @importFrom stringr str_detect str_to_upper
-#' @importFrom tidyr starts_with unnest
 compute_staytime_tables <- function(fach,
                                     log_times,
                                     unit_domains,

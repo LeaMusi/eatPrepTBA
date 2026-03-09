@@ -112,7 +112,6 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
   }
 }
 
-#' @importFrom dplyr any_of
 prepare_codes <- function(codes) {
   codes %>%
     purrr::list_transpose() %>%

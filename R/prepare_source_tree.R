@@ -55,7 +55,6 @@ prepare_source_tree <- function(coding_scheme) {
   }
 }
 
-#' @importFrom dplyr setdiff union
 fill_source_tree <- function(dependencies,
                              current_sources,
                              previous_sources = list()) {

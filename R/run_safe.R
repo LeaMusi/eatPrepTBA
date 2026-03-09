@@ -1,4 +1,3 @@
-#' @importFrom shiny req
 run_safe <- function(req = req,
                      error_message = "Something went wrong with the API request",
                      default = NULL) {

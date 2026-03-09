@@ -21,7 +21,7 @@
 #'
 #' @aliases
 #' prepare_codebook,WorkspaceStudio-method
-#' @importFrom methods setGeneric
+
 setGeneric("prepare_codebook", function(workspace,
                                         unit_keys = NULL,
                                         missings = NULL,
@@ -49,7 +49,7 @@ setGeneric("prepare_codebook", function(workspace,
 })
 
 #' @describeIn prepare_codebook Download a file of a defined workspace
-#' @importFrom methods setMethod signature
+
 setMethod("prepare_codebook",
           signature = signature(workspace = "WorkspaceStudio"),
           function(workspace,
@@ -127,7 +127,7 @@ setMethod("prepare_codebook",
           })
 
 #' @keywords internal
-#' @importFrom dplyr any_of
+
 prepare_codebook_units <- function(units,
                                    unit_entries = c("key", "name", "variables")) {
   units %>%
@@ -143,7 +143,7 @@ prepare_codebook_units <- function(units,
 }
 
 #' @keywords internal
-#' @importFrom dplyr any_of
+
 prepare_codebook_variables <- function(variables,
                                        variable_entries = c("id", "label", "codes")) {
   variables %>%
@@ -159,7 +159,7 @@ prepare_codebook_variables <- function(variables,
 }
 
 #' @keywords internal
-#' @importFrom dplyr any_of
+
 prepare_codebook_codes <- function(codes,
                                    code_entries = c("id", "label", "description"),
                                    missing_codes) {

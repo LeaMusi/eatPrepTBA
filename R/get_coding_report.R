@@ -10,7 +10,7 @@
 #'
 #' @aliases
 #' get_coding_report,WorkspaceStudio-method
-#' @importFrom methods setGeneric
+
 setGeneric("get_coding_report", function(workspace) {
   cli_setting()
 
@@ -18,7 +18,7 @@ setGeneric("get_coding_report", function(workspace) {
 })
 
 #' @describeIn get_coding_report Upload a file in a defined workspace
-#' @importFrom methods setMethod signature
+
 setMethod("get_coding_report",
           signature = signature(workspace = "WorkspaceStudio"),
           function(workspace) {

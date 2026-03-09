@@ -1,7 +1,0 @@
-any_of = dplyr
-div = shiny
-intersect = dplyr
-setdiff = dplyr
-show = methods
-starts_with = tidyr
-union = dplyr
